@@ -1,0 +1,126 @@
+\documentclass[a4paper,12pt,openany]{article}
+\usepackage[utf8]{inputenc}       % Allows UTF-8 encoding
+\usepackage[T5]{fontenc}          % Supports Vietnamese characters
+\usepackage[vietnamese]{babel}    % Vietnamese language support
+\usepackage{graphicx}             % For inserting images
+\usepackage[margin=2cm]{geometry} % Reduces page margins
+
+\title{Chữa bài tập vi xử lí}
+\author{Bùi Nhật Minh}
+
+% Xử lí số đếm của bài tập
+\newcounter{exercise}
+
+\NewDocumentCommand{\exercise}{o}{
+   \refstepcounter{exercise}
+   \noindent\textbf{Bài \arabic{exercise}:}
+   \IfNoValueTF{#1}
+      {\label{ex\arabic{exercise}}}
+      {\label{#1}}
+}
+
+% Xử lí số đếm lời giải
+\newcounter{solution}
+
+\NewDocumentCommand{\solution}{o}{
+   \refstepcounter{solution}
+   \IfNoValueTF{#1}
+      {\noindent\textbf{Lời giải bài~\ref{ex\arabic{exercise}}:}}
+      {\noindent\textbf{Lời giải bài~\ref{#1}}:}
+   \IfNoValueTF{#1}
+      {\label{sol\arabic{solution}}}
+      {\label{sol-#1}}
+}
+
+\begin{document}
+
+\maketitle
+
+\exercise Trình bày kiến trúc và nguyên lí hoạt động của máy tính theo Von Neumann.
+
+\solution 
+
+Kiến trúc Von Neumann gồm các thành phần sau:
+\begin{itemize}
+    \item Bộ xử lí trung tâm (CPU - Central Processing Unit), bên trong có đơn vị điều khiển (CU - Control Unit), đơn vị tính toán số học và lô-gíc (ALU - Arithmetic Logic Unit) và các thanh ghi;
+    \item Bộ nhớ;
+    \item Thiết bị vào/ra.
+\end{itemize}
+Các bộ phận này được kết nối với nhau bởi các đường truyền hệ thống (bus): dữ liệu, địa chỉ, và điều khiển.
+
+Về mặt nguyên lí hoạt động, chương trình và dữ liệu được giữ chung ở cùng một bộ nhớ. Thông qua các đường truyền, lệnh và dữ liệu được chuyển vào và được thực hiện bởi bộ xử lí trung tâm. Trong trường hợp cần thiết, các bộ phận vào/ra có thể tương tác với bộ xử lí trung tâm hay trực tiếp với bộ nhớ, cũng qua các đường truyền.
+
+\exercise Nêu vai trò của CPU và bộ nhớ trong máy tính theo hệ kiến trúc Von Neumann.
+
+\solution
+
+Bộ xử lí trung tâm (CPU), theo đúng tên của nó, chịu trách nhiệm tiếp nhận và xử lí dữ liệu; điều khiển các hoạt động bên trong máy tính.
+
+Bộ nhớ có vai trò ghi nhớ chương trình và dữ liệu phục vụ việc chạy và trong quá trình chạy chương trình.
+
+\exercise Mô tả chi tiết hoạt động thực hiện một lệnh của CPU. Nêu cơ chế mà nhờ đó CPU có thể thực hiện một cách tuần tự và nguyên lí mà CPU có thể thực hiện rẽ nhánh có điều kiện.
+
+\solution 
+
+Nhờ sự kết hợp của đơn vị điều khiển và bộ đếm chương trình (PC - Program Counter), CPU có thể thực hiện lệnh một cách tuần tự như sau:
+\begin{enumerate}
+    \item Tìm lệnh (Fetch): Qua bộ giải mã địa chỉ với PC làm địa chỉ, CPU lấy giá trị lưu trong ô nhớ có địa chỉ tương ứng. CPU cần phải nhận biết xem giá trị này là lệnh hay là dữ liệu. Nếu là lệnh, đưa giá trị này vào thanh ghi lệnh. Nếu là dữ liệu, đưa vào những thanh ghi nhớ phục vụ những lệnh sau.
+    \item Giải mã lệnh (Decode): Từ lệnh trong thanh ghi lệnh, cho nó đi qua một mạch giải mã để chuyển đổi từ mã lệnh thành lệnh.
+    \item Thực hiện lệnh (Execute): Từ kết quả của mạch giải mã, CPU thực hiện lệnh.
+    \item Lưu trữ (Store); Kết quả sau khi thực hiện lệnh sẽ được lưu ở trong bộ nhớ hoặc trong một thanh ghi. PC tự động tăng thêm 1 (nếu không phải là lệnh rẽ nhánh), qua đó đảm bảo tính tuần tự.
+\end{enumerate}
+
+Tóm lại, CPU nhận lệnh và dữ liệu từ bộ nhớ với địa chỉ là PC thông qua mạch giải mã. Sau khi kết thúc lệnh, PC tự động tăng thêm 1, thể hiện tính tuần tự.
+
+Như đã nhắc đến, trong trường hợp mạch giải mã lệnh ra lệnh rẽ nhánh thì CPU sẽ thay đổi giá trị PC đến vị trí của lệnh tiếp theo thay vì cho PC làm tuần tự như bình thường.
+
+\exercise Nêu rõ vì sao có thể nối chung đường truyền (bus) số liệu trong hệ thống vi xử lí.
+
+\solution
+
+Các bus số liệu trong hệ thống có thể nối chung với nhau \textbf{mà không bị xung đột (hai đơn vị dùng chung bus cùng một lúc, hoặc vừa dùng đường dữ liệu để truyền ra và nhập vào trên cùng một đơn vị)} vì bộ điều khiển phát xung tín hiệu điều khiển, chỉ cho phép những đơn vị cần thiết để thực hiện lệnh tương tác với đường dữ liệu và chỉ cho phép xuất hoặc nhập trong một thời điểm nhất định. Điều này làm tiết kiệm đường truyền dữ liệu và có thể tích hợp xuất/nhập trên cùng đường truyền.
+
+\exercise Trình bày rõ vì sao CPU có thể truy nhập theo địa chỉ.
+
+\solution 
+
+CPU có thể truy cập theo địa chỉ bởi vì trong kiến trúc máy tính, mọi ô nhớ và cổng vào/ra \textbf{chỉ được gán một địa chỉ duy nhất}. Từ đó, CPU đặt các địa chỉ ô nhớ lên các đường truyền địa chỉ, và ô nhớ hay thiết bị vào/ra có đúng địa chỉ đó sẽ phản hồi và tương tác với CPU.
+
+\exercise Anh/chị hiểu thế nào về câu: ``CPU truy nhập cổng vào/ra như một ô nhớ và truy nhập ô nhớ nhờ cổng vào ra.''?
+
+\solution
+
+Trong một số kiến trúc, địa chỉ vào/ra được gán địa chỉ trong không gian bộ nhớ\footnote{Ví dụ, kiến trúc Von Neumann, khi tất cả bộ nhớ chương trình, bộ nhớ dữ liệu, và địa chỉ vào ra được dự trữ ở cùng một ``bộ nhớ''.}. CPU nếu muốn đọc hay ghi vào thiết bị ngoại vi, chỉ cần truy cập vào vùng địa chỉ xác định trong bộ nhớ, giống như truy cập vào bộ nhớ thông thường.
+
+Ngoài ra, trong một vài trường hợp khác, CPU không có khả năng truy cập trực tiếp vào bộ nhớ (hay xảy ra khi phải ghi và nhận vào dữ liệu từ bộ nhớ ngoài như trong cơ chế DMA\footnote{Direct Memory Access. CPU ghi các thông số cần thiết và gửi lên các thanh ghi điều khiển của DMA. Sau đó, DMA tự động điều khiển bus để truyền dữ liệu.} hay thay đổi VRAM). Khi này, CPU phải truyền lệnh qua các cổng vào/ra để thực hiện xuất và nhập dữ liệu cần thiết.
+
+\exercise Nêu cơ chế ngắt trong hệ vi xử lí và mục đích của cơ chế này. Hệ vi xử lí thực hiện ngắt như thế nào? Chỉ rõ ưu, khuyết điểm của cơ chế ngắt.
+
+\solution 
+
+Trong hệ vi xử lí, ngắt là hoạt động tạm dừng chương trình bình thường để thực thi chương trình ngắt, với mục đích chính là để kịp thời phản ứng với sự kiện bên ngoài (chủ yếu là tác động vào/ra).
+
+Chu trình ngắt cua hệ vi xử lí được thực hiện như sau:
+\begin{enumerate}
+    \item Khi vi xử lí nhận và chấp nhận báo ngắt, hoàn thành nốt lệnh hiện tại.
+    \item Sau đó, lưu trạng thái hiện tại (còn được gọi là ``ngữ cảnh'', bao gồm bộ đếm chương trình, các thanh ghi đặc biệt, ghi cờ, v.v) vào ngăn xếp.
+    \item Vi xử lí sau khi lưu ngữ cảnh chuyển sang thực hiện chương trình phục vụ ngắt.
+    \item Hoàn thành chương trình phục vụ ngắt, vi xử lí khôi phục ngữ cảnh từ ngăn xếp, tiếp tục thực hiện chương trình bình thường.
+\end{enumerate}
+
+Ưu điểm của cơ chế ngắt bao gồm:
+\begin{itemize}
+    \item
+\end{itemize}
+
+Nhược điểm của cơ chế ngắt bao gồm:
+\begin{itemize}
+    \item 
+\end{itemize}
+
+\exercise Trình bày cách xác định nguồn báo ngắt bằng phần mềm, xác định bằng phần cứng.
+
+\solution
+
+
+\end{document}
