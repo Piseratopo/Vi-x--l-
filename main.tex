@@ -3,7 +3,7 @@
 \usepackage[vietnamese]{babel}
 \usepackage{graphicx}             % For inserting images
 \usepackage[margin=2cm]{geometry} % Reduces page margins
-\usepackage{xparse} 
+\usepackage{xparse, icomma, amsmath} 
 
 \title{Chữa bài tập vi xử lí}
 \author{Bùi Nhật Minh}
@@ -12,24 +12,24 @@
 \newcounter{exercise}
 
 \NewDocumentCommand{\exercise}{o}{
-   \refstepcounter{exercise}
-   \noindent\textbf{Bài \arabic{exercise}:}
-   \IfNoValueTF{#1}
-      {\label{ex\arabic{exercise}}}
-      {\label{#1}}
+    \refstepcounter{exercise}
+    \noindent\textbf{Bài \arabic{exercise}:}
+    \IfNoValueTF{#1}
+        {\label{ex\arabic{exercise}}}
+        {\label{#1}}
 }
 
 % Xử lí số đếm lời giải
 \newcounter{solution}
 
 \NewDocumentCommand{\solution}{o}{
-   \refstepcounter{solution}
-   \IfNoValueTF{#1}
-      {\noindent\textbf{Lời giải bài~\ref{ex\arabic{exercise}}:}}
-      {\noindent\textbf{Lời giải bài~\ref{#1}}:}
-   \IfNoValueTF{#1}
-      {\label{sol\arabic{solution}}}
-      {\label{sol-#1}}
+    \refstepcounter{solution}
+    \IfNoValueTF{#1}
+        {\noindent\textbf{Lời giải bài~\ref{ex\arabic{exercise}}:}}
+        {\noindent\textbf{Lời giải bài~\ref{#1}}:}
+    \IfNoValueTF{#1}
+        {\label{sol\arabic{solution}}}
+        {\label{sol-#1}}
 }
 
 \begin{document}
@@ -122,5 +122,70 @@ Nhược điểm của cơ chế ngắt bao gồm:
 
 \solution
 
+\exercise Trong những thanh ghi có chức năng đặc biệt của 8051, có thanh ghi DPTR. Giải thích chức năng và cách hoạt động của thanh ghi này. Làm sao để biết DPTR đang truy cập đến vùng nhớ nào?
+
+\solution
+
+DPTR (Data Pointer) là thanh ghi $16$-bit dùng để chỉ đến byte dữ liệu trong bộ nhớ RAM ngoài hoặc/và bộ nhớ ROM. DPTR không có một địa chỉ đơn, nhưng người lập trình có thể viết vào DPTR như trong lệnh sau:
+\begin{verbatim}
+    MOV DPTR, #1234H
+\end{verbatim}
+
+Giá trị trong thanh ghi DPTR không xác định được bộ nhớ đang sử dụng là kiểu bộ nhớ nào. Để biết kiểu bộ nhớ đang dùng, cần phụ thuộc vào câu lệnh sử dụng thanh ghi DPTR. Ví dụ:
+\begin{verbatim}
+    MOVX A,@DPTR                        ; viết dữ liệu từ RAM ngoài vào A
+    MOVC A,@DPTR                        ; viết dữ liệu từ ROM vào A
+\end{verbatim}
+
+\exercise Ta có thể truy cập vào băng thanh ghi nào khi 8051 vừa được cấp nguồn, vì sao, và làm thế nào để thay đổi nó?
+
+\solution
+
+Băng 0, do khi vừa cấp nguồn, cả hai giá trị bit RS0 và RS1 của thanh ghi PSW đều được khởi tạo bằng $0$. Để thay đổi băng, ta cần thay đổi giá trị bit RS0 và RS1 (bit D3 và D4) của thanh ghi PSW như trong lệnh sau (thay đổi sang băng $1$):
+\begin{verbatim}
+    CLR PSW.4 
+    SETB PSW.3 
+\end{verbatim}
+
+\exercise Viết chương trình sử dụng 8051 để tạo xung vuông có tần số $100$ kHz ở cổng P1.7. Cho biết rằng tần số dao động của xung tạo từ mạch thạch anh là $11,0592$ MHz.
+
+\solution
+
+Ta có chương trình như sau:
+
+\begin{verbatim}
+    ORG 0 
+    SJMP START 
+    ORG 0040H 
+    PULSE: 
+        SETB P1.7 
+        NOP 
+        NOP
+        NOP
+        NOP
+        CLR P1.7
+        NOP 
+        NOP
+        AJMP PULSE 
+    END 
+\end{verbatim}
+
+Thời gian P1.7 được kích ở mức lô-gíc $1$ được tính như sau:
+\begin{itemize}
+    \item \texttt{SETB P1.7}: $12$ chu kì;
+    \item Thời gian tạm nghỉ \texttt{NOP}: $12 \times 4$ chu kì.
+\end{itemize}
+Thời gian P1.7 được kích ở mức lô-gíc $1$ là $$12 + 12 \times 4 = 60$$ chu kì mạch dao động thạch anh. Thời gian P1.7 được kích ở mức lô-gíc $0$ được tính như sau:
+\begin{itemize}
+    \item \texttt{CLR P1.7}: $12$ chu kì;
+    \item Thời gian tạm nghỉ \texttt{NOP}: $12 \times 2$ chu kì;
+    \item \texttt{AJMP PULSE}: $24$ chu kì.
+\end{itemize}
+Thời gian P1.7 được kích ở mức lô-gíc $0$ là $12 + 12 \times 2 + 24 = 60$ chu kì mạch dao động thạch anh.
+
+Qua đó, chúng ta có chu kì của dao động là $60 + 60 = 120$ chu kì mạch dao động thạch anh. Tần số của dao động này bằng:
+$$\frac{1}{120\times \frac{1}{11,0592 \times 10^6 \text{ Hz}}} = 92160 \text{ Hz}.$$
+
+Sở dĩ chúng ta không thể làm tốt hơn là do một lệnh của 8051 chạy với thời gian là bội số của $12$ lần dao động. Nếu mỗi nửa chu kì một lệnh \texttt{NOP} thì tần số dao động sẽ là $$\frac{1}{(120 - 12 \times 2)\times \frac{1}{11,0592 \times 10^6 \text{ Hz}}} = 115200 \text{ Hz}.$$
 
 \end{document}
