@@ -122,6 +122,12 @@ Nhược điểm của cơ chế ngắt bao gồm:
 
 \solution
 
+\exercise Trong tập lệnh của MCS-51 không có lệnh \texttt{ORG} và \texttt{END}. Tại sao trong một số chương trình, ta lại có thể thấy hai lệnh này?
+
+\solution
+
+Đây không phải là lệnh dành cho vi xử lí mà là lệnh dành cho trình biên dịch.
+
 \exercise Trong những thanh ghi có chức năng đặc biệt của 8051, có thanh ghi DPTR. Giải thích chức năng và cách hoạt động của thanh ghi này. Làm sao để biết DPTR đang truy cập đến vùng nhớ nào?
 
 \solution
@@ -187,5 +193,43 @@ Qua đó, chúng ta có chu kì của dao động là $60 + 60 = 120$ chu kì m�
 $$\frac{1}{120\times \frac{1}{11,0592 \times 10^6 \text{ Hz}}} = 92160 \text{ Hz}.$$
 
 Sở dĩ chúng ta không thể làm tốt hơn là do một lệnh của 8051 chạy với thời gian là bội số của $12$ lần dao động. Nếu mỗi nửa chu kì một lệnh \texttt{NOP} thì tần số dao động sẽ là $$\frac{1}{(120 - 12 \times 2)\times \frac{1}{11,0592 \times 10^6 \text{ Hz}}} = 115200 \text{ Hz}.$$
+
+\exercise Khi người ta đề cập đến vùng bộ nhớ có thể truy cập theo bít của 8051, vùng bộ nhớ này bắt đầu từ địa chỉ byte nào và đến địa chỉ byte nào? Ngoài ra, còn ở những đâu có thể truy cập theo từng bít (trả lời ngắn gọn). Viết câu lệnh đặt bít thứ $5$ (đếm bít từ vị trí thứ $0$) của byte có địa chỉ $2BH$ thành giá trị $1$.
+
+\solution
+
+Vùng bộ nhớ có thể truy cập theo bít của 8051 bắt đầu từ địa chỉ byte $20H$ đến địa chỉ byte $2FH$. Bít truy cập theo địa chỉ được gán địa chỉ từ $00H$ đến $7FH$. Ngoài ra, còn có thể truy cập theo từng bít trong một số thanh ghi có chức năng đặc biệt.
+
+Các bít trong vùng bộ nhớ có thể truy cập theo bít có địa chỉ riêng từ $00H$ đến $7FH$. Công thức để tính vị trí của bít là:
+$$
+    \text{Địa chỉ của bit} = \left(\text{Địa chỉ của byte} - 20H\right) \times 8 + \text{Vị trí của bit trong byte}.
+$$
+Câu lệnh đặt bít thứ $5$ (đếm bít từ vị trí thứ $0$) của byte có địa chỉ $2BH$ thành giá trị $1$ là:
+\begin{verbatim}
+    SETB 5DH
+\end{verbatim}
+
+\exercise Khi ngăn xếp không có dữ liệu, thanh ghi địa chỉ ngăn xếp (SP) chỉ vào vùng có địa chỉ bao nhiêu trong bộ nhớ? Viết lệnh để đặt giá trị $50H$ vào ngăn xếp. Với địa chỉ ban đầu đó, giá trị mới này được lưu vào đâu?
+
+\solution
+
+Khi ngăn xếp không có dữ liệu, SP chỉ vào vùng có địa chỉ $07H$. Viết lệnh để đặt giá trị $50H$ vào ngăn xếp là:
+\begin{verbatim}
+    MOV 50H, #50H
+    PUSH 50H
+\end{verbatim}
+Với lệnh \texttt{PUSH}, giá trị của SP sẽ tăng lên $1$ trước khi đưa dữ liệu vào ngăn xếp. Vậy giá trị của $50H$ được lưu trong thanh ghi $08H$.
+
+\exercise Viết lệnh để đặt giá trị của $A$ vào ngăn xếp sử dụng phương pháp truy địa chỉ trực tiếp. Tại sao trong một số trường hợp, có thể thay thế lệnh này bằng các lệnh như \texttt{PUSH ACC} hay \texttt{PUSH A}, mặc dù trong tập lệnh không có lệnh đó?
+
+\solution
+
+Lệnh để đặt giá trị của $A$ vào ngăn xếp là
+\begin{verbatim}
+    PUSH 80H
+\end{verbatim}
+Có thể thay thế được bằng các lệnh như đề bài là do trình biên dịch (assembler) đã hiểu rằng \texttt{ACC} hay \texttt{A} ám chỉ thanh ghi địa chỉ $80H$ và biên dịch hộ người lập trình.
+
+
 
 \end{document}
